@@ -7,10 +7,17 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { UrlService } from './url/url.service';
 import { UrlController } from './url/url.controller';
+import { AuthModule } from './auth/auth.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, UserModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    UserModule,
+    AuthModule,
+  ],
   controllers: [AuthController, UrlController],
-  providers: [PrismaService, AuthService, UrlService],
+  providers: [PrismaService, JwtService, AuthService, UrlService],
 })
 export class AppModule {}
