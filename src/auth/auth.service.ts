@@ -5,9 +5,11 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
-import { loginDto, signUpDto } from './dto';
+import { loginDto, resetPasswordDto, signUpDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { TokenService } from 'src/utils/token/token.service';
+import { TokenEnumType } from 'src/utils/token/enum';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
+    private tokenService: TokenService,
   ) {}
 
   async signUp({ email, password, ...rest }: signUpDto) {
@@ -28,11 +31,11 @@ export class AuthService {
         },
       });
 
-      const token = await this.signToken(user.id, user.email);
+      const access_token = await this.signToken(user.id, user.email);
       delete user.password;
 
       return {
-        token,
+        access_token,
         data: {
           user,
         },
@@ -56,18 +59,58 @@ export class AuthService {
       throw new UnauthorizedException(`Invalid credentials`);
     }
 
-    const token = await this.signToken(user.id, user.email);
+    const access_token = await this.signToken(user.id, user.email);
 
     delete user.password;
     return {
-      token,
+      access_token,
       data: {
         user,
       },
     };
   }
 
-  async signToken(userId: string, email: string): Promise<string> {
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new UnauthorizedException(`Invalid credentials`);
+    }
+
+    const token = await this.tokenService.generateToken(
+      TokenEnumType.PASSWORD_RESET,
+      user.email,
+      15 * 60 * 1000,
+    );
+    delete user.password;
+    return { data: { token, user } };
+  }
+
+  async resetPassword(id: string, { token, newPassword }: resetPasswordDto) {
+    const user = await this.prisma.user.findFirst({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException(`Invalid credentials`);
+    }
+
+    await this.tokenService.validateToken(
+      TokenEnumType.PASSWORD_RESET,
+      user.email,
+      token,
+    );
+
+    const hashPassword = await argon.hash(newPassword);
+
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: { password: hashPassword },
+    });
+  }
+
+  private async signToken(userId: string, email: string): Promise<string> {
     const payLoad = { sub: userId, email };
     const secret = this.config.get('JWT_SECRET');
     const expiresIn = this.config.get('JWT_EXPIRES_IN');
