@@ -2,9 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { RequestInterceptor } from './utils/interceptors/req.interceptor';
-import { ResponseInterceptor } from './utils/interceptors/res.interceptor';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { RequestInterceptor } from './auth/interceptors/req.interceptor';
+import { ResponseInterceptor } from './auth/interceptors/res.interceptor';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
