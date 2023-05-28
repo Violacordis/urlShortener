@@ -7,16 +7,19 @@ import {
   ParseUUIDPipe,
   Patch,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/auth/guard';
-import { ApiResponseMetadata, GetUser } from 'src/utils/decorators';
+import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('Users')
 @ApiBearerAuth()
+@UseInterceptors(CacheInterceptor)
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
