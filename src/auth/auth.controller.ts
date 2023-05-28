@@ -2,22 +2,27 @@ import {
   Body,
   Controller,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
+  changePasswordDto,
   forgotPasswordDto,
   loginDto,
   resetPasswordDto,
   signUpDto,
 } from './dto';
-import { ApiTags } from '@nestjs/swagger';
-import { ApiResponseMetadata } from 'src/auth/decorators';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
+import { User } from '@prisma/client';
+import { JwtGuard } from './guard/jwt.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('Auth')
+@UseInterceptors(CacheInterceptor)
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -34,8 +39,8 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  async forgotPassword(@Body() { email }: forgotPasswordDto) {
-    return this.authService.forgotPassword(email);
+  async forgotPassword(@Body() dto: forgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
   }
 
   @ApiResponseMetadata({
@@ -44,5 +49,15 @@ export class AuthController {
   @Patch('reset-password')
   async resetPassword(@Param('id') id: string, @Body() dto: resetPasswordDto) {
     return this.authService.resetPassword(id, dto);
+  }
+
+  @ApiResponseMetadata({
+    message: 'You have changed your Password Successfully !!',
+  })
+  @Patch('change-password')
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  async changePassword(@GetUser() user: User, @Body() dto: changePasswordDto) {
+    return this.authService.changePassword(user, dto);
   }
 }

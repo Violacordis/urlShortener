@@ -5,11 +5,18 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
-import { loginDto, resetPasswordDto, signUpDto } from './dto';
+import {
+  changePasswordDto,
+  forgotPasswordDto,
+  loginDto,
+  resetPasswordDto,
+  signUpDto,
+} from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenService } from 'src/utils/token/token.service';
 import { TokenEnumType } from 'src/utils/token/enum';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -70,7 +77,7 @@ export class AuthService {
     };
   }
 
-  async forgotPassword(email: string) {
+  async forgotPassword({ email }: forgotPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -108,6 +115,31 @@ export class AuthService {
       where: { email: user.email },
       data: { password: hashPassword },
     });
+  }
+
+  async changePassword(
+    { email }: User,
+    { currentPassword, newPassword }: changePasswordDto,
+  ) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      throw new UnauthorizedException(`Invalid credentials`);
+    }
+
+    const isPasswordAMatch = await argon.verify(user.password, currentPassword);
+
+    if (!isPasswordAMatch) {
+      throw new ForbiddenException(`Incorrect Password`);
+    }
+    const hashPassword = await argon.hash(newPassword);
+
+    await this.prisma.user.update({
+      where: { email: user.email },
+      data: { password: hashPassword },
+    });
+
+    delete user.password;
   }
 
   private async signToken(userId: string, email: string): Promise<string> {
