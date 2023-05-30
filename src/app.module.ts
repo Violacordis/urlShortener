@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TokenService } from './utils/token/token.service';
 import { TokenModule } from './utils/token/token.module';
 import { CacheModule } from './utils/cache/cache.module';
+import { MailerModule } from './utils/mailer/mailer.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -20,6 +21,7 @@ import { CacheModule } from './utils/cache/cache.module';
     AuthModule,
     TokenModule,
     CacheModule,
+    MailerModule,
   ],
   controllers: [AuthController, UrlController],
   providers: [PrismaService, JwtService, AuthService, UrlService, TokenService],

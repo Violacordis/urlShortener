@@ -4,10 +4,11 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategy';
 import { TokenModule } from 'src/utils/token/token.module';
+import { MailerService } from 'src/utils/mailer/mailer.service';
 
 @Module({
   imports: [JwtModule.register({}), TokenModule],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, MailerService],
   controllers: [AuthController],
 })
 export class AuthModule {}

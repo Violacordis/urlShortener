@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { TokenService } from 'src/utils/token/token.service';
 import { TokenEnumType } from 'src/utils/token/enum';
 import { User } from '@prisma/client';
+import { MailerService } from 'src/utils/mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
@@ -25,30 +26,38 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
     private tokenService: TokenService,
+    private mailer: MailerService,
   ) {}
 
-  async signUp({ email, password, ...rest }: signUpDto) {
+  async signUp({ email, password, userName }: signUpDto) {
     const hashPassword = await argon.hash(password);
     try {
       const user = await this.prisma.user.create({
         data: {
           email,
           password: hashPassword,
-          ...rest,
+          userName,
         },
       });
 
-      const access_token = await this.signToken(user.id, user.email);
       delete user.password;
 
-      return {
-        access_token,
-        data: {
-          user,
-        },
-      };
+      const token = await this.tokenService.generateToken(
+        TokenEnumType.EMAIL_VERIFICATION,
+        user.email,
+        15 * 60 * 1000,
+      );
+
+      await this.mailer.sendEmailConfirmationMail(user, token);
+
+      return user;
     } catch (err) {
-      throw new ForbiddenException(`Email already exists`);
+      console.log(err.message);
+      if (err.code === 'P2002') {
+        throw new ForbiddenException('Email address already exists');
+      }
+
+      throw err;
     }
   }
 
