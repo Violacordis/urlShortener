@@ -53,3 +53,9 @@ export class changePasswordDto {
   @MinLength(5)
   newPassword: string;
 }
+
+export class verifyEmailDto {
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+}

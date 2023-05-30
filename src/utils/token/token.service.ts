@@ -30,8 +30,9 @@ export class TokenService {
 
     const { id, type, token } = JSON.parse(existingToken);
 
-    if (id !== email && type !== key && token !== userToken)
-      throw new BadRequestException('Invalid token');
+    if (id !== email || type !== key || token !== userToken) {
+      throw new BadRequestException('Invalid token1');
+    }
 
     await this.cache.remove(key);
     return true;

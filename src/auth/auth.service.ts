@@ -1,6 +1,9 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
+  Param,
+  ParseUUIDPipe,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,6 +14,7 @@ import {
   loginDto,
   resetPasswordDto,
   signUpDto,
+  verifyEmailDto,
 } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -18,6 +22,7 @@ import { TokenService } from 'src/utils/token/token.service';
 import { TokenEnumType } from 'src/utils/token/enum';
 import { User } from '@prisma/client';
 import { MailerService } from 'src/utils/mailer/mailer.service';
+import { GetUser } from './decorators';
 
 @Injectable()
 export class AuthService {
@@ -59,6 +64,38 @@ export class AuthService {
 
       throw err;
     }
+  }
+
+  async verifyEmail(
+    @Param('id', ParseUUIDPipe) id: string,
+    { token }: verifyEmailDto,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new BadRequestException(
+        `Invalid credentials !!. We are unable to verify your email address`,
+      );
+    }
+
+    const verifyToken = await this.tokenService.validateToken(
+      TokenEnumType.EMAIL_VERIFICATION,
+      user.email,
+      token,
+    );
+
+    if (!verifyToken) {
+      throw new BadRequestException(
+        `Invalid credentials !!. We are unable to verify your email address yet`,
+      );
+    }
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { isVerified: true },
+    });
   }
 
   async login({ email, password }: loginDto) {

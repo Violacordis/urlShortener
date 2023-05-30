@@ -14,6 +14,7 @@ import {
   loginDto,
   resetPasswordDto,
   signUpDto,
+  verifyEmailDto,
 } from './dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
@@ -27,9 +28,19 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiResponseMetadata({
+    message:
+      'Email Confirmation sent !!!. Please check your inbox to confirm your email address',
+  })
   @Post('signup')
   async signUp(@Body() dto: signUpDto) {
     return this.authService.signUp(dto);
+  }
+
+  @ApiResponseMetadata({ message: 'Email address verified successfully' })
+  @Post('verify-email/:id')
+  async verifyEmail(@Param('id') id: string, @Body() dto: verifyEmailDto) {
+    return this.authService.verifyEmail(id, dto);
   }
 
   @ApiResponseMetadata({ message: 'You have logged in!' })
