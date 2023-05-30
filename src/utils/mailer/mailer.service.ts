@@ -18,4 +18,30 @@ export class MailerService {
         'Email Confirmation sent !!!. Please check your inbox to confirm your email address',
     };
   }
+
+  async sendPasswordResetEmail({ email, userName }: User, token: string) {
+    await this.mailer.sendMail({
+      to: email,
+      subject: 'Reset your Password',
+      template: 'passwordReset',
+      context: { userName, token },
+    });
+
+    return {
+      message: 'Password reset code sent. Please check your inbox',
+    };
+  }
+
+  async sendPasswordResetSuccessMail({ email, userName }: User) {
+    await this.mailer.sendMail({
+      to: email,
+      subject: 'Password Reset is Successful',
+      template: 'passwordResetSuccess',
+      context: { userName },
+    });
+
+    return {
+      message: 'Your Password reset is successful',
+    };
+  }
 }
