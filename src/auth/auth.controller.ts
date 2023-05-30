@@ -49,6 +49,9 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @ApiResponseMetadata({
+    message: 'Password reset code sent. Please check your inbox',
+  })
   @Post('forgot-password')
   async forgotPassword(@Body() dto: forgotPasswordDto) {
     return this.authService.forgotPassword(dto);
@@ -57,7 +60,7 @@ export class AuthController {
   @ApiResponseMetadata({
     message: 'You have successfully reset your Password !!',
   })
-  @Patch('reset-password')
+  @Patch('reset-password/:id')
   async resetPassword(@Param('id') id: string, @Body() dto: resetPasswordDto) {
     return this.authService.resetPassword(id, dto);
   }

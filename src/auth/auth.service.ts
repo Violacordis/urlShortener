@@ -137,7 +137,9 @@ export class AuthService {
       15 * 60 * 1000,
     );
     delete user.password;
-    return { data: { token, user } };
+
+    await this.mailer.sendPasswordResetEmail(user, token);
+    return user;
   }
 
   async resetPassword(id: string, { token, newPassword }: resetPasswordDto) {
@@ -161,6 +163,8 @@ export class AuthService {
       where: { email: user.email },
       data: { password: hashPassword },
     });
+
+    await this.mailer.sendPasswordResetSuccessMail(user);
   }
 
   async changePassword(
