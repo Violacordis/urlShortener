@@ -71,4 +71,16 @@ export class UrlService {
       throw new Error(err.message);
     }
   }
+
+  async fetchUserUrls(user: User) {
+    try {
+      const urls = await this.prisma.url.findMany({
+        where: { userId: user.id },
+        include: { analytics: true },
+      });
+      return urls;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
 }

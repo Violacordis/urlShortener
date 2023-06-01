@@ -2,6 +2,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
+  Get,
   Post,
   UseGuards,
   UseInterceptors,
@@ -15,15 +16,20 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @ApiTags('URL')
+@UseGuards(JwtGuard)
 @ApiBearerAuth()
 @UseInterceptors(CacheInterceptor)
 @Controller('url')
 export class UrlController {
   constructor(private url: UrlService, private prisma: PrismaService) {}
 
-  @UseGuards(JwtGuard)
   @Post('shorten')
   async shortenLongUrl(@Body() dto: shortenLongUrlDto, @GetUser() user: User) {
     return this.url.shortenLongUrl(user, dto);
+  }
+
+  @Get()
+  async fetchUserUrls(@GetUser() user: User) {
+    return await this.url.fetchUserUrls(user);
   }
 }
