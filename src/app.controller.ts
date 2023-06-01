@@ -1,16 +1,19 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import { UrlService } from './url/url.service';
 import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
   constructor(private url: UrlService) {}
 
+  @ApiTags('Base URL')
   @Get()
   getHello(): string {
     return 'Hello World!';
   }
 
+  @ApiTags('Redirect URL')
   @Get('/:shortUrl')
   async redirectToLongUrl(
     @Param('shortUrl') shortUrl: string,
