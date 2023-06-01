@@ -29,6 +29,7 @@ model Url {
   id           String   @id @default(uuid())
   longUrl      String
   shortUrl     String   @unique
+  title        String?
   customDomain String?
   clicks       Int      @default(0)
   createdAt    DateTime @default(now())

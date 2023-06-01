@@ -13,6 +13,8 @@ import { TokenService } from './utils/token/token.service';
 import { TokenModule } from './utils/token/token.module';
 import { CacheModule } from './utils/cache/cache.module';
 import { MailerModule } from './utils/mailer/mailer.module';
+import { AppController } from './app.controller';
+import { UrlModule } from './url/url.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -22,8 +24,9 @@ import { MailerModule } from './utils/mailer/mailer.module';
     TokenModule,
     CacheModule,
     MailerModule,
+    UrlModule,
   ],
-  controllers: [AuthController, UrlController],
+  controllers: [AuthController, UrlController, AppController],
   providers: [PrismaService, JwtService, AuthService, UrlService, TokenService],
 })
 export class AppModule {}
