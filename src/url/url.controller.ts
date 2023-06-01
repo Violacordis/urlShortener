@@ -2,17 +2,11 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
-  Get,
-  NotFoundException,
-  Param,
   Post,
-  Redirect,
-  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
 import { UrlService } from './url.service';
 import { shortenLongUrlDto } from './dto';
 import { GetUser } from 'src/auth/decorators';
