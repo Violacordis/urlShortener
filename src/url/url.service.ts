@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { User } from '@prisma/client';
-import { shortenLongUrlDto } from './dto';
+import { Url, User } from '@prisma/client';
+import { shortenLongUrlDto, updateShortUrlAnalyticsDto } from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { appUtils } from 'src/app.utils';
 import { CacheService } from 'src/utils/cache/cache.service';
+import { Request } from 'express';
 
 @Injectable()
 export class UrlService {
@@ -51,19 +52,21 @@ export class UrlService {
     }
   }
 
-  async redirectToLongUrl(shortUrl: string) {
+  async redirectToLongUrl(shortUrl: string, req: Request) {
     try {
       const cacheKey = `redirectUrl`;
 
       const cachedUrl = await this.cache.get(cacheKey);
 
-      if (cachedUrl) return cachedUrl;
+      if (cachedUrl) this.cache.remove(cacheKey);
 
       const url = await this.prisma.url.findUnique({ where: { shortUrl } });
 
       if (!url) {
         throw new NotFoundException('Url not found');
       }
+
+      await this.updateShortUrlAnalytics(url, req);
       await this.cache.set(cacheKey, url.longUrl);
 
       return url.longUrl;
@@ -79,6 +82,38 @@ export class UrlService {
         include: { analytics: true },
       });
       return urls;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+
+  async updateShortUrlAnalytics(
+    { shortUrl, id }: Url,
+    req: Request,
+  ): Promise<void> {
+    try {
+      const { ip, headers } = req;
+      const args: updateShortUrlAnalyticsDto = {
+        timestamp: new Date(),
+        ipAddress: ip,
+        userAgent: headers['user-agent'],
+      };
+
+      await this.prisma.shortUrlAnalytics.create({
+        data: {
+          ...args,
+          urlId: id,
+        },
+      });
+
+      await this.prisma.url.update({
+        where: { shortUrl },
+        data: {
+          clicks: {
+            increment: 1,
+          },
+        },
+      });
     } catch (err) {
       throw new Error(err.message);
     }

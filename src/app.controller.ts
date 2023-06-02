@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Controller, Get, Param, Req, Res } from '@nestjs/common';
 import { UrlService } from './url/url.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller()
@@ -17,9 +17,10 @@ export class AppController {
   @Get('/:shortUrl')
   async redirectToLongUrl(
     @Param('shortUrl') shortUrl: string,
+    @Req() request: Request,
     @Res() response: Response,
   ) {
-    const longUrl = await this.url.redirectToLongUrl(shortUrl);
+    const longUrl = await this.url.redirectToLongUrl(shortUrl, request);
 
     if (longUrl) {
       response.redirect(301, longUrl);
