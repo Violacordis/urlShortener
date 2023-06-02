@@ -136,4 +136,23 @@ export class UrlService {
       return { message: err.message };
     }
   }
+
+  async deleteUrl(id: string) {
+    try {
+      const url = await this.prisma.url.findUnique({ where: { id } });
+
+      if (!url) {
+        throw new NotFoundException('Urn Not Found');
+      }
+
+      await this.prisma.shortUrlAnalytics.deleteMany({
+        where: { urlId: url.id },
+      });
+      await this.prisma.url.delete({ where: { id: url.id } });
+
+      await this.cache.reset();
+    } catch (err) {
+      return { message: err.message };
+    }
+  }
 }

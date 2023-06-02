@@ -1,4 +1,3 @@
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -8,7 +7,6 @@ import {
   Patch,
   Post,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UrlService } from './url.service';
@@ -39,5 +37,11 @@ export class UrlController {
   @Patch('/:id')
   async editUrl(@Param('id') id: string, @Body() dto: editUrlDto) {
     return await this.url.editUrl(id, dto);
+  }
+
+  @ApiResponseMetadata({ message: 'Url is deleted successfully !!!' })
+  @Delete('/:id')
+  async deleteUrl(@Param('id') id: string) {
+    return await this.url.deleteUrl(id);
   }
 }
