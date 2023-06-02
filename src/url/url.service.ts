@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Url, User } from '@prisma/client';
-import { shortenLongUrlDto, updateShortUrlAnalyticsDto } from './dto';
+import {
+  editUrlDto,
+  shortenLongUrlDto,
+  updateShortUrlAnalyticsDto,
+} from './dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { appUtils } from 'src/app.utils';
 import { CacheService } from 'src/utils/cache/cache.service';
@@ -9,11 +12,7 @@ import { Request } from 'express';
 
 @Injectable()
 export class UrlService {
-  constructor(
-    private prisma: PrismaService,
-    private config: ConfigService,
-    private cache: CacheService,
-  ) {}
+  constructor(private prisma: PrismaService, private cache: CacheService) {}
 
   async shortenLongUrl(
     user: User,
@@ -75,18 +74,6 @@ export class UrlService {
     }
   }
 
-  async fetchUserUrls(user: User) {
-    try {
-      const urls = await this.prisma.url.findMany({
-        where: { userId: user.id },
-        include: { analytics: true },
-      });
-      return urls;
-    } catch (err) {
-      throw new Error(err.message);
-    }
-  }
-
   async updateShortUrlAnalytics(
     { shortUrl, id }: Url,
     req: Request,
@@ -116,6 +103,37 @@ export class UrlService {
       });
     } catch (err) {
       throw new Error(err.message);
+    }
+  }
+
+  async fetchUserUrls(user: User) {
+    try {
+      const urls = await this.prisma.url.findMany({
+        where: { userId: user.id },
+        include: { analytics: true },
+      });
+      return urls;
+    } catch (err) {
+      return { message: err.message };
+    }
+  }
+
+  async editUrl(id: string, { longUrl, title }: editUrlDto) {
+    try {
+      const url = await this.prisma.url.findUnique({ where: { id } });
+
+      if (!url) {
+        throw new NotFoundException('Url not found');
+      }
+
+      await this.prisma.url.update({
+        where: { id: url.id },
+        data: { longUrl, title },
+      });
+
+      await this.cache.reset();
+    } catch (err) {
+      return { message: err.message };
     }
   }
 }

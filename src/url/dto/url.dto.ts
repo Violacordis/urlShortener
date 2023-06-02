@@ -1,3 +1,4 @@
+import { OmitType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -30,3 +31,5 @@ export class updateShortUrlAnalyticsDto {
   @IsString()
   ipAddress: string;
 }
+
+export class editUrlDto extends OmitType(shortenLongUrlDto, ['customDomain']) {}
