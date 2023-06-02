@@ -46,6 +46,7 @@ model ShortUrlAnalytics {
   id        String   @id @default(uuid())
   userAgent String?
   ipAddress String?
+  timestamp DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
