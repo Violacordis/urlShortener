@@ -18,7 +18,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @ApiTags('URL')
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
-@UseInterceptors(CacheInterceptor)
 @Controller('url')
 export class UrlController {
   constructor(private url: UrlService, private prisma: PrismaService) {}
@@ -28,7 +27,7 @@ export class UrlController {
     return this.url.shortenLongUrl(user, dto);
   }
 
-  @Get()
+  @Get('all')
   async fetchUserUrls(@GetUser() user: User) {
     return await this.url.fetchUserUrls(user);
   }
