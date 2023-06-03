@@ -31,12 +31,13 @@ export class UrlService {
           shortUrl: url.shortUrl,
         };
       }
+      const customDomainUrl = `${customDomain}/${shortUrlCode}`;
 
       const result = await this.prisma.url.create({
         data: {
           ...rest,
           longUrl,
-          shortUrl: shortUrlCode,
+          shortUrl: customDomain ? customDomainUrl : shortUrlCode,
           customDomain,
           userId: user.id,
         },
@@ -57,7 +58,7 @@ export class UrlService {
 
       const cachedUrl = await this.cache.get(cacheKey);
 
-      if (cachedUrl) this.cache.remove(cacheKey);
+      if (cachedUrl) this.cache.reset();
 
       const url = await this.prisma.url.findUnique({ where: { shortUrl } });
 
