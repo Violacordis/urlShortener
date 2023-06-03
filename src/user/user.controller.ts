@@ -16,10 +16,12 @@ import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('Users')
 @ApiBearerAuth()
 @UseInterceptors(CacheInterceptor)
+@UseGuards(ThrottlerGuard)
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}

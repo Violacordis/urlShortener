@@ -30,6 +30,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.3.0",
     "@prisma/client": "^4.14.1",
+    "@nestjs/throttler": "^4.0.0",
     "argon2": "^0.30.3",
     "cache-manager": "^5.2.1",
     "cache-manager-redis-store": "^3.0.1",

@@ -15,6 +15,7 @@ import { CacheModule } from './utils/cache/cache.module';
 import { MailerModule } from './utils/mailer/mailer.module';
 import { AppController } from './app.controller';
 import { UrlModule } from './url/url.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -25,6 +26,10 @@ import { UrlModule } from './url/url.module';
     CacheModule,
     MailerModule,
     UrlModule,
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
   ],
   controllers: [AuthController, UrlController, AppController],
   providers: [PrismaService, JwtService, AuthService, UrlService, TokenService],

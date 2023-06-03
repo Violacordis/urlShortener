@@ -15,9 +15,11 @@ import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @ApiTags('URL')
 @UseGuards(JwtGuard)
+@UseGuards(ThrottlerGuard)
 @ApiBearerAuth()
 @Controller('url')
 export class UrlController {
