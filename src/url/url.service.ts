@@ -111,9 +111,23 @@ export class UrlService {
     try {
       const urls = await this.prisma.url.findMany({
         where: { userId: user.id },
-        include: { analytics: true },
+        include: { analytics: true, qrcode: true },
       });
-      return urls;
+
+      const urlsWithModifiedQrCode = urls.map((url) => {
+        const qrCode = url.qrcode;
+
+        if (!qrCode || !qrCode.image) return url;
+
+        const imageBuffer = Buffer.from(qrCode.image);
+        const base64ImageUrl = `data:image/png;base64,${imageBuffer.toString(
+          'base64',
+        )}`;
+
+        return { ...url, qrcode: { ...qrCode, image: base64ImageUrl } };
+      });
+
+      return urlsWithModifiedQrCode;
     } catch (err) {
       return { message: err.message };
     }
