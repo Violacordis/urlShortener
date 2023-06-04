@@ -133,6 +133,23 @@ export class UrlService {
     }
   }
 
+  async getUrl(id: string) {
+    try {
+      const url = await this.prisma.url.findUnique({
+        where: { id },
+        include: { analytics: true, qrcode: true },
+      });
+
+      if (!url) {
+        throw new NotFoundException(`URL not found !`);
+      }
+
+      return url;
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+
   async editUrl(id: string, { longUrl, title }: editUrlDto) {
     try {
       const url = await this.prisma.url.findUnique({ where: { id } });

@@ -30,6 +30,11 @@ export class UrlController {
     return await this.url.fetchUserUrls(user);
   }
 
+  @Get('/:id')
+  async getUrl(@Param('id') id: string) {
+    return await this.url.getUrl(id);
+  }
+
   @Post('shorten')
   async shortenLongUrl(@Body() dto: shortenLongUrlDto, @GetUser() user: User) {
     return this.url.shortenLongUrl(user, dto);
