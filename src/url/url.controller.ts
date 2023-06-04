@@ -14,8 +14,8 @@ import { editUrlDto, shortenLongUrlDto } from './dto';
 import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
 import { User } from '@prisma/client';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { QrCodeService } from 'src/qr-code/qr-code.service';
 
 @ApiTags('URL')
 @UseGuards(JwtGuard)
@@ -23,16 +23,21 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 @ApiBearerAuth()
 @Controller('url')
 export class UrlController {
-  constructor(private url: UrlService, private prisma: PrismaService) {}
+  constructor(private url: UrlService, private qrCode: QrCodeService) {}
+
+  @Get('all')
+  async fetchUserUrls(@GetUser() user: User) {
+    return await this.url.fetchUserUrls(user);
+  }
 
   @Post('shorten')
   async shortenLongUrl(@Body() dto: shortenLongUrlDto, @GetUser() user: User) {
     return this.url.shortenLongUrl(user, dto);
   }
 
-  @Get('all')
-  async fetchUserUrls(@GetUser() user: User) {
-    return await this.url.fetchUserUrls(user);
+  @Post('/:id/qrcode')
+  async generateQrCode(@Param('id') id: string) {
+    return await this.qrCode.generateQrCode(id);
   }
 
   @ApiResponseMetadata({ message: 'Url is updated successfully !!!' })

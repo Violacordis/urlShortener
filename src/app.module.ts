@@ -16,6 +16,7 @@ import { MailerModule } from './utils/mailer/mailer.module';
 import { AppController } from './app.controller';
 import { UrlModule } from './url/url.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { QrCodeModule } from './qr-code/qr-code.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -30,6 +31,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       ttl: 60,
       limit: 10,
     }),
+    QrCodeModule,
   ],
   controllers: [AuthController, UrlController, AppController],
   providers: [PrismaService, JwtService, AuthService, UrlService, TokenService],
