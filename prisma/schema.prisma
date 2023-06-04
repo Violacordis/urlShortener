@@ -38,6 +38,7 @@ model Url {
   userId    String
   user      User                @relation(fields: [userId], references: [id])
   analytics ShortUrlAnalytics[]
+  qrcode    QrCode?
 
   @@map("urls")
 }
@@ -54,4 +55,11 @@ model ShortUrlAnalytics {
   url   Url    @relation(fields: [urlId], references: [id])
 
   @@map("short_url_analytics")
+}
+
+model QrCode {
+  id    String @id @default(uuid())
+  urlId String @unique
+  url   Url    @relation(fields: [urlId], references: [id])
+  image Bytes
 }
