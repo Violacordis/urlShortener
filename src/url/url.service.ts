@@ -112,6 +112,7 @@ export class UrlService {
       const urls = await this.prisma.url.findMany({
         where: { userId: user.id },
         include: { analytics: true, qrcode: true },
+        orderBy: { createdAt: 'desc' },
       });
 
       const urlsWithModifiedQrCode = urls.map((url) => {
