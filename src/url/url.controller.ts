@@ -51,4 +51,12 @@ export class UrlController {
   async deleteUrl(@Param('id') id: string) {
     return await this.url.deleteUrl(id);
   }
+
+  @ApiResponseMetadata({
+    message: ' The QR Code of this URL is deleted successfully !!!',
+  })
+  @Delete('/:id/qrcode')
+  async deleteQrCode(@Param('id') id: string) {
+    return await this.qrCode.deleteQrCode(id);
+  }
 }

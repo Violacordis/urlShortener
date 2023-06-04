@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { QRCodeToFileOptionsPng, toBuffer } from 'qrcode';
+import { toBuffer } from 'qrcode';
 import * as sharp from 'sharp';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -40,7 +40,6 @@ export class QrCodeService {
 
       return qrCodeImage;
     } catch (err) {
-      console.log(err);
       throw new Error(err.message);
     }
   }
@@ -52,6 +51,22 @@ export class QrCodeService {
       if (!qrcode) throw new NotFoundException(`QR Code not found`);
 
       return qrcode.image;
-    } catch (error) {}
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+
+  async deleteQrCode(id: string) {
+    try {
+      const qrcode = await this.prisma.qrCode.findFirst({
+        where: { urlId: id },
+      });
+
+      if (!qrcode) throw new NotFoundException(`QR Code not found`);
+
+      await this.prisma.qrCode.delete({ where: { urlId: id } });
+    } catch (err) {
+      throw new Error(err.message);
+    }
   }
 }
