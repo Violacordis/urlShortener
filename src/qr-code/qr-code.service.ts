@@ -44,4 +44,14 @@ export class QrCodeService {
       throw new Error(err.message);
     }
   }
+
+  async fetchQrCode(id: string) {
+    try {
+      const qrcode = await this.prisma.qrCode.findFirst({ where: { id } });
+
+      if (!qrcode) throw new NotFoundException(`QR Code not found`);
+
+      return qrcode.image;
+    } catch (error) {}
+  }
 }
