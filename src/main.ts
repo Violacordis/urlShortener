@@ -16,11 +16,11 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Url Shortener')
-    .setDescription('Url Shortener API')
+    .setTitle('Shortify')
+    .setDescription('A Url Shortener Web App')
     .setVersion('1.0')
     .addBearerAuth()
-    .addTag('Url Shortener, AltschoolAfrica Capstone Project')
+    .addTag('My AltschoolAfrica Capstone Project')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

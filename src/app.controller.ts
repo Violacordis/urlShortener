@@ -8,10 +8,10 @@ import { PrismaService } from './prisma/prisma.service';
 export class AppController {
   constructor(private url: UrlService, private prisma: PrismaService) {}
 
-  @ApiTags('Base URL')
+  @ApiTags('Home page')
   @Get()
   getHello(): string {
-    return 'Hello World!';
+    return 'Hello World! Welcome to my Shortify Web app';
   }
 
   @ApiTags('Redirect URL')
