@@ -157,13 +157,15 @@ export class UrlService {
       const url = await this.prisma.url.findUnique({ where: { id } });
 
       if (!url) {
-        throw new NotFoundException('Urn Not Found');
+        throw new NotFoundException('URL Not Found');
       }
 
       await this.prisma.shortUrlAnalytics.deleteMany({
-        where: { urlId: url.id },
+        where: { urlId: id },
       });
-      await this.prisma.url.delete({ where: { id: url.id } });
+
+      await this.prisma.qrCode.delete({ where: { urlId: id } });
+      await this.prisma.url.delete({ where: { id } });
 
       await this.cache.reset();
     } catch (err) {
