@@ -6,7 +6,6 @@ import {
   ParseUUIDPipe,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
 import {
   changePasswordDto,
@@ -18,11 +17,11 @@ import {
 } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { TokenService } from 'src/utils/token/token.service';
-import { TokenEnumType } from 'src/utils/token/enum';
+import { PrismaService } from '../prisma/prisma.service';
+import { TokenService } from '../utils/token/token.service';
+import { TokenEnumType } from '../utils/token/enum';
+import { MailerService } from '../utils/mailer/mailer.service';
 import { User } from '@prisma/client';
-import { MailerService } from 'src/utils/mailer/mailer.service';
-import { GetUser } from './decorators';
 
 @Injectable()
 export class AuthService {

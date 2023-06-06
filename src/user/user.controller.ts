@@ -11,12 +11,12 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from 'src/auth/guard';
-import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { JwtGuard } from '../auth/guard';
+import { ApiResponseMetadata, GetUser } from '../auth/decorators';
 
 @ApiTags('Users')
 @ApiBearerAuth()

@@ -5,10 +5,10 @@ import {
   shortenLongUrlDto,
   updateShortUrlAnalyticsDto,
 } from './dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { appUtils } from 'src/app.utils';
-import { CacheService } from 'src/utils/cache/cache.service';
 import { Request } from 'express';
+import { appUtils } from '../app.utils';
+import { PrismaService } from '../prisma/prisma.service';
+import { CacheService } from '../utils/cache/cache.service';
 
 @Injectable()
 export class UrlService {

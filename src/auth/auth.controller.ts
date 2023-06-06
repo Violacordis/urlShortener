@@ -17,10 +17,10 @@ import {
   verifyEmailDto,
 } from './dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
 import { User } from '@prisma/client';
 import { JwtGuard } from './guard/jwt.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { ApiResponseMetadata, GetUser } from './decorators';
 
 @ApiTags('Auth')
 @UseInterceptors(CacheInterceptor)

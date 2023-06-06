@@ -11,11 +11,11 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UrlService } from './url.service';
 import { editUrlDto, shortenLongUrlDto } from './dto';
-import { ApiResponseMetadata, GetUser } from 'src/auth/decorators';
 import { User } from '@prisma/client';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { QrCodeService } from 'src/qr-code/qr-code.service';
+import { JwtGuard } from '../auth/guard';
+import { QrCodeService } from '../qr-code/qr-code.service';
+import { ApiResponseMetadata, GetUser } from '../auth/decorators';
 
 @ApiTags('URL')
 @UseGuards(JwtGuard)

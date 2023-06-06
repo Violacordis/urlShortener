@@ -1,7 +1,7 @@
 import { Body, Injectable, Param, ParseUUIDPipe } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { GetUser } from 'src/auth/decorators';
+import { PrismaService } from '../../src/prisma/prisma.service';
+import { GetUser } from '../auth/decorators/getUser.decorator';
 import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
