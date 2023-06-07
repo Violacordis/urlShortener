@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -44,6 +46,7 @@ export class AuthController {
   }
 
   @ApiResponseMetadata({ message: 'You have logged in!' })
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() dto: loginDto) {
     return this.authService.login(dto);
