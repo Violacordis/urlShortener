@@ -5,7 +5,7 @@ import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { loginDto, signUpDto } from '../src/auth/dto';
 import { UpdateUserDto } from '../src/user/dto/updateUser.dto';
-import { shortenLongUrlDto } from '../src/url/dto';
+import { editUrlDto, shortenLongUrlDto } from '../src/url/dto';
 
 describe('App e2e', () => {
   let app: INestApplication;
@@ -150,14 +150,121 @@ describe('App e2e', () => {
           .expectBodyContains(dto.userName);
       });
     });
+  });
 
-    describe('Delete user', () => {
-      it('should delete user account', () => {
+  // Url
+  describe('Url', () => {
+    describe('get empty url', () => {
+      it('should have an empty url', () => {
         return pactum
           .spec()
-          .delete('/users/{id}')
+          .get('/url/all')
           .withHeaders({ Authorization: `Bearer $S{userAt}` })
-          .withPathParams('id', `$S{userId}`)
+          .expectStatus(200)
+          .expectBody([]);
+      });
+    });
+
+    describe('Shorten url', () => {
+      const dto: shortenLongUrlDto = {
+        longUrl: 'https://dev.octocare.co/billings/company-accounts',
+        title: 'octocare',
+      };
+      it('should create shortUrl (shortened longUrl)', () => {
+        return pactum
+          .spec()
+          .post('/url/shorten')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withBody(dto)
+          .expectStatus(201)
+          .stores('urlId', 'id')
+          .stores('shUrl', 'shortUrl')
+          .stores('lngUrl', 'longUrl')
+          .inspect();
+      });
+    });
+
+    describe('Get urls by id', () => {
+      it('should get a url by the id', () => {
+        return pactum
+          .spec()
+          .get('/url/{id}')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withPathParams('id', `$S{urlId}`)
+          .expectStatus(200);
+      });
+    });
+
+    describe('URL redirect', () => {
+      it('should redirect short url to longUrl', () => {
+        return pactum
+          .spec()
+          .get('/{shortUrl}')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withPathParams('shortUrl', `$S{shUrl}`)
+          .withFollowRedirects(true)
+          .expectStatus(200)
+          .inspect();
+      });
+    });
+
+    describe('qrcode', () => {
+      it('should generate qrcode for shortUrl', () => {
+        return pactum
+          .spec()
+          .post('/url/{id}/qrcode')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withPathParams('id', `$S{urlId}`)
+          .expectStatus(201);
+      });
+    });
+
+    describe('Edit url', () => {
+      const dto: editUrlDto = {
+        longUrl: 'https://twitter.com/home',
+        title: 'Twitter',
+      };
+      it('should edit and update url ', () => {
+        return pactum
+          .spec()
+          .patch('/url/{id}')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withPathParams('id', `$S{urlId}`)
+          .withBody(dto)
+          .expectStatus(200)
+          .inspect();
+      });
+    });
+
+    describe('Get urls', () => {
+      it('should get all loggedIn user urls', () => {
+        return pactum
+          .spec()
+          .get('/url/all')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .expectStatus(200)
+          .expectJsonLength(1)
+          .inspect();
+      });
+    });
+
+    describe('Delete qrcode', () => {
+      it('should delete a url qrcode', () => {
+        return pactum
+          .spec()
+          .delete('/url/{id}/qrcode')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withPathParams('id', '$S{urlId}')
+          .expectStatus(200);
+      });
+    });
+    describe('Delete url', () => {
+      it('should delete url', () => {
+        return pactum
+          .spec()
+          .delete('/url/{id}')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withPathParams('id', `$S{urlId}`)
           .expectStatus(200);
       });
     });
