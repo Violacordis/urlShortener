@@ -173,7 +173,7 @@ describe('App e2e', () => {
       it('should create shortUrl (shortened longUrl)', () => {
         return pactum
           .spec()
-          .post('/url/shorten')
+          .post('/url/create-shortUrl')
           .withHeaders({ Authorization: `Bearer $S{userAt}` })
           .withBody(dto)
           .expectStatus(201)
