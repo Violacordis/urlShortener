@@ -118,4 +118,48 @@ describe('App e2e', () => {
       });
     });
   });
+
+  // User
+  describe('User', () => {
+    describe('Get me', () => {
+      it('should not fetch user when unauthorized', () => {
+        return pactum.spec().get('/users/me').expectStatus(401);
+      });
+    });
+    it('should get current user', () => {
+      return pactum
+        .spec()
+        .get('/users/me')
+        .withHeaders({ Authorization: `Bearer $S{userAt}` })
+        .stores('userId', 'id')
+        .expectStatus(200);
+    });
+
+    describe('Edit user', () => {
+      it('should edit user details', () => {
+        const dto: UpdateUserDto = {
+          userName: 'Adaobi',
+        };
+        return pactum
+          .spec()
+          .patch('/users/{id}')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withPathParams('id', '$S{userId}')
+          .withBody(dto)
+          .expectStatus(200)
+          .expectBodyContains(dto.userName);
+      });
+    });
+
+    describe('Delete user', () => {
+      it('should delete user account', () => {
+        return pactum
+          .spec()
+          .delete('/users/{id}')
+          .withHeaders({ Authorization: `Bearer $S{userAt}` })
+          .withPathParams('id', `$S{userId}`)
+          .expectStatus(200);
+      });
+    });
+  });
 });
