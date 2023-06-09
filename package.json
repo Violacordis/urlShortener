@@ -15,6 +15,7 @@
     "prisma:studio": "npx dotenv -e .env -- prisma studio",
     "prisma:generate": "npx dotenv -e .env -- prisma generate",
     "prisma:migrate": "npx dotenv -e .env -- prisma migrate dev",
+    "prisma:migrate:onlineDb": "npx dotenv -e .env -- prisma db push",
     "prisma:studio:test": "npx dotenv -e .env.test -- prisma studio",
     "prisma:generate:test": "npx dotenv -e .env.test -- prisma generate",
     "prisma:migrate:test": "npx dotenv -e .env.test -- prisma migrate dev",
