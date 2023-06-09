@@ -41,13 +41,4 @@ export class UserController {
   ) {
     return this.userService.updateUser(user, id, updateDto);
   }
-
-  @ApiResponseMetadata({
-    message: 'Your account has been deleted successfully',
-  })
-  @Delete('/:id')
-  @UseGuards(JwtGuard)
-  async deleteUser(@Param('id', ParseUUIDPipe) id: string) {
-    return this.userService.deleteUser(id);
-  }
 }

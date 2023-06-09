@@ -1,4 +1,4 @@
-import { Body, Injectable, Param, ParseUUIDPipe } from '@nestjs/common';
+import { Body, Injectable, Param, ParseUUIDPipe, Req } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetUser } from '../auth/decorators/getUser.decorator';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -31,12 +31,5 @@ export class UserService {
     }
     delete updatedUser.password;
     return updatedUser;
-  }
-
-  async deleteUser(@Param('id', ParseUUIDPipe) id: string) {
-    await this.prisma.user.delete({
-      where: { id },
-      include: { urls: true },
-    });
   }
 }
