@@ -27,7 +27,7 @@ export class UrlService {
 
       if (url) {
         return {
-          message: `This Url has already been shortened. Here is the shortened url...`,
+          message: `${longUrl} is already shortened. Here is the shortened url...`,
           shortUrl: url.shortUrl,
         };
       }
