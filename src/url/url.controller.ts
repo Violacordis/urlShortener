@@ -11,7 +11,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UrlService } from './url.service';
 import { editUrlDto, shortenLongUrlDto } from './dto';
-import { Url, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { JwtGuard } from '../auth/guard';
 import { QrCodeService } from '../qr-code/qr-code.service';
