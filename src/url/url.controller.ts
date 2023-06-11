@@ -11,7 +11,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UrlService } from './url.service';
 import { editUrlDto, shortenLongUrlDto } from './dto';
-import { User } from '@prisma/client';
+import { Url, User } from '@prisma/client';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { JwtGuard } from '../auth/guard';
 import { QrCodeService } from '../qr-code/qr-code.service';
@@ -49,6 +49,18 @@ export class UrlController {
   @Patch('/:id')
   async editUrl(@Param('id') id: string, @Body() dto: editUrlDto) {
     return await this.url.editUrl(id, dto);
+  }
+
+  @ApiResponseMetadata({ message: 'Url is activated successfully !!!' })
+  @Patch('/:id/activate')
+  async activateUrl(@Param('id') id: string) {
+    return await this.url.activateUrl(id);
+  }
+
+  @ApiResponseMetadata({ message: 'Url is deactivated successfully !!!' })
+  @Patch('/:id/deactivate')
+  async deactivateUrl(@Param('id') id: string) {
+    return await this.url.deactivateUrl(id);
   }
 
   @ApiResponseMetadata({ message: 'Url is deleted successfully !!!' })

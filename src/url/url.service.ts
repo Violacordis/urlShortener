@@ -58,9 +58,11 @@ export class UrlService {
 
       const cachedUrl = await this.cache.get(cacheKey);
 
-      if (cachedUrl) this.cache.reset();
+      if (cachedUrl) return cachedUrl;
 
-      const url = await this.prisma.url.findUnique({ where: { shortUrl } });
+      const url = await this.prisma.url.findFirst({
+        where: { shortUrl, isActive: true },
+      });
 
       if (!url) {
         throw new NotFoundException('Url not found');
@@ -165,6 +167,27 @@ export class UrlService {
       });
 
       await this.cache.reset();
+    } catch (err) {
+      return { message: err.message };
+    }
+  }
+
+  async activateUrl(id: string) {
+    try {
+      await this.prisma.url.update({
+        where: { id },
+        data: { isActive: true, updatedAt: new Date() },
+      });
+    } catch (err) {
+      return { message: err.message };
+    }
+  }
+  async deactivateUrl(id: string) {
+    try {
+      await this.prisma.url.update({
+        where: { id },
+        data: { isActive: false, updatedAt: new Date() },
+      });
     } catch (err) {
       return { message: err.message };
     }
