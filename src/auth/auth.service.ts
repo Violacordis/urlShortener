@@ -79,6 +79,10 @@ export class AuthService {
       );
     }
 
+    if (user.isVerified) {
+      return { message: 'This Email is already verified' };
+    }
+
     const verifyToken = await this.tokenService.validateToken(
       TokenEnumType.EMAIL_VERIFICATION,
       user.email,
@@ -102,8 +106,10 @@ export class AuthService {
       where: { email },
     });
 
-    if (!user) {
-      throw new UnauthorizedException(`Invalid credentials`);
+    if (!user || !user.isVerified) {
+      throw new UnauthorizedException(
+        `It's either your email is not yet verified or you don't have an account with us`,
+      );
     }
 
     const verifyPassword = await argon.verify(user.password, password);

@@ -44,6 +44,7 @@ export class UrlService {
         include: {
           user: { select: { id: true } },
           analytics: true,
+          qrcode: true,
         },
       });
       return result;
