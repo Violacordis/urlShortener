@@ -23,6 +23,7 @@ import { User } from '@prisma/client';
 import { JwtGuard } from './guard/jwt.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { ApiResponseMetadata, GetUser } from './decorators';
+import { TokenEnumType } from '../utils/token/enum/token.enum';
 
 @ApiTags('Auth')
 @UseInterceptors(CacheInterceptor)
@@ -43,6 +44,13 @@ export class AuthController {
   @Post('verify-email/:id')
   async verifyEmail(@Param('id') id: string, @Body() dto: verifyEmailDto) {
     return this.authService.verifyEmail(id, dto);
+  }
+
+  @ApiResponseMetadata({ message: 'New Token sent successfully!!!' })
+  @HttpCode(HttpStatus.OK)
+  @Post('new-token/:id')
+  resendToken(@Param('id') id: string) {
+    return this.authService.resendToken(id, TokenEnumType.EMAIL_VERIFICATION);
   }
 
   @ApiResponseMetadata({ message: 'You have logged in!' })

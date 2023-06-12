@@ -49,7 +49,7 @@ export class AuthService {
       const token = await this.tokenService.generateToken(
         TokenEnumType.EMAIL_VERIFICATION,
         user.email,
-        15 * 60 * 1000,
+        5 * 60 * 1000,
       );
 
       await this.mailer.sendEmailConfirmationMail(user, token);
@@ -99,6 +99,28 @@ export class AuthService {
       where: { id },
       data: { isVerified: true },
     });
+
+    await this.mailer.emailConfirmedMail(user);
+  }
+
+  async resendToken(id: string, TokenEnumType) {
+    const user = await this.prisma.user.findFirst({
+      where: { id, isVerified: false },
+    });
+
+    if (!user || user.isVerified) {
+      throw new BadRequestException(
+        `It's either this email is verified or invalid`,
+      );
+    }
+
+    const token = await this.tokenService.generateToken(
+      TokenEnumType,
+      user.email,
+      5 * 60 * 1000,
+    );
+
+    await this.mailer.sendEmailConfirmationMail(user, token);
   }
 
   async login({ email, password }: loginDto) {
@@ -139,7 +161,7 @@ export class AuthService {
     const token = await this.tokenService.generateToken(
       TokenEnumType.PASSWORD_RESET,
       user.email,
-      15 * 60 * 1000,
+      5 * 60 * 1000,
     );
     delete user.password;
 
