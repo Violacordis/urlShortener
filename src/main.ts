@@ -7,8 +7,9 @@ import { ResponseInterceptor } from './auth/interceptors/res.interceptor';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.enableCors({ origin: '*' });
   app.enableVersioning({
     type: VersioningType.URI,
     prefix: 'api/v1',
