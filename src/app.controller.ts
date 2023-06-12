@@ -27,9 +27,9 @@ export class AppController {
 
     if (url.customDomain) {
       const domain = url.customDomain;
-      const originalUrl = decodeURIComponent(request.originalUrl); // Decode the original URL
-      const path = originalUrl.replace(`/${domain}/`, ''); // Remove the custom domain from the original URL
-      const customDomainUrl = `${domain}/${path}`; // Construct the custom domain URL
+      const originalUrl = decodeURIComponent(request.originalUrl);
+      const path = originalUrl.replace(`/${domain}/`, '');
+      const customDomainUrl = `${domain}/${path}`;
 
       const longUrl = await this.url.redirectToLongUrl(
         customDomainUrl,
