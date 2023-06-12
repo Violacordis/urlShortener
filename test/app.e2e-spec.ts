@@ -209,7 +209,7 @@ describe('App e2e', () => {
       it('should redirect short url to longUrl', () => {
         return pactum
           .spec()
-          .get('/api/v1/{shortUrl}')
+          .get('/{shortUrl}')
           .withHeaders({ Authorization: `Bearer $S{userAt}` })
           .withPathParams('shortUrl', `$S{shUrl}`)
           .withFollowRedirects(true)

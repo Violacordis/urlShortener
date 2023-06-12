@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { PrismaService } from './prisma/prisma.service';
 
-@Controller({ version: '/' })
+@Controller()
 export class AppController {
   constructor(private url: UrlService, private prisma: PrismaService) {}
 
