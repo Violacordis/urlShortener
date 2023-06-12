@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Url, User } from '@prisma/client';
 import {
   editUrlDto,
@@ -66,7 +70,9 @@ export class UrlService {
       });
 
       if (!url) {
-        throw new NotFoundException('Url not found');
+        throw new BadRequestException(
+          'URL not found. This URL may have been deactivated',
+        );
       }
 
       await this.updateShortUrlAnalytics(url, req);
@@ -147,6 +153,9 @@ export class UrlService {
       if (!url) {
         throw new NotFoundException(`URL not found !`);
       }
+
+      if (!url.qrcode) return url;
+
       const qrCode = url.qrcode;
       const imageBuffer = Buffer.from(qrCode.image);
       const base64ImageUrl = `data:image/png;base64,${imageBuffer.toString(
@@ -161,7 +170,9 @@ export class UrlService {
 
   async editUrl(id: string, { longUrl, title }: editUrlDto) {
     try {
-      const url = await this.prisma.url.findUnique({ where: { id } });
+      const url = await this.prisma.url.findFirst({
+        where: { id, isActive: true },
+      });
 
       if (!url) {
         throw new NotFoundException('Url not found');

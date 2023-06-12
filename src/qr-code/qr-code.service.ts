@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { toBuffer } from 'qrcode';
 import * as sharp from 'sharp';
@@ -10,9 +14,14 @@ export class QrCodeService {
 
   async generateQrCode(urlId: string): Promise<Buffer> {
     try {
-      const url = await this.prisma.url.findFirst({ where: { id: urlId } });
+      const url = await this.prisma.url.findFirst({
+        where: { id: urlId, isActive: true },
+      });
 
-      if (!url) throw new NotFoundException(`URL not found`);
+      if (!url)
+        throw new NotFoundException(
+          `URL not found. This URL may have been deactivated`,
+        );
 
       const baseUrl = this.config.get('BASE_URL');
       const qrCodeUrl = `${baseUrl}/${url.shortUrl}`;
@@ -48,7 +57,7 @@ export class QrCodeService {
     try {
       const qrcode = await this.prisma.qrCode.findFirst({ where: { id } });
 
-      if (!qrcode) throw new NotFoundException(`QR Code not found`);
+      if (!qrcode) throw new BadRequestException(`QR Code not found`);
 
       return qrcode.image;
     } catch (err) {
