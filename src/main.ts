@@ -4,11 +4,15 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { RequestInterceptor } from './auth/interceptors/req.interceptor';
 import { ResponseInterceptor } from './auth/interceptors/res.interceptor';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.enableVersioning({
+    type: VersioningType.URI,
+    prefix: 'api/v1',
+  });
 
   app.useGlobalInterceptors(
     new RequestInterceptor(),

@@ -21,7 +21,7 @@ import { ApiResponseMetadata, GetUser } from '../auth/decorators';
 @UseGuards(JwtGuard)
 @UseGuards(ThrottlerGuard)
 @ApiBearerAuth()
-@Controller('url')
+@Controller({ version: '/url' })
 export class UrlController {
   constructor(private url: UrlService, private qrCode: QrCodeService) {}
 

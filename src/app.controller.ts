@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { PrismaService } from './prisma/prisma.service';
 
-@Controller()
+@Controller({ version: '/' })
 export class AppController {
   constructor(private url: UrlService, private prisma: PrismaService) {}
 
@@ -21,7 +21,9 @@ export class AppController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
-    const url = await this.prisma.url.findUnique({ where: { shortUrl } });
+    const url = await this.prisma.url.findFirst({
+      where: { shortUrl, isActive: true },
+    });
 
     if (url.customDomain) {
       const domain = url.customDomain;

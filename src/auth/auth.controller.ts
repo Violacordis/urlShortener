@@ -26,7 +26,7 @@ import { ApiResponseMetadata, GetUser } from './decorators';
 
 @ApiTags('Auth')
 @UseInterceptors(CacheInterceptor)
-@Controller('auth')
+@Controller({ version: '/auth' })
 export class AuthController {
   constructor(private authService: AuthService) {}
 

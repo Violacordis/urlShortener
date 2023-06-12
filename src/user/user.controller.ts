@@ -16,13 +16,13 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { JwtGuard } from '../auth/guard';
-import { ApiResponseMetadata, GetUser } from '../auth/decorators';
+import { GetUser } from '../auth/decorators';
 
 @ApiTags('Users')
 @ApiBearerAuth()
 @UseInterceptors(CacheInterceptor)
 @UseGuards(ThrottlerGuard)
-@Controller('users')
+@Controller({ version: '/users' })
 export class UserController {
   constructor(private userService: UserService) {}
 
