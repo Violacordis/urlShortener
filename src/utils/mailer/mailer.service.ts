@@ -18,6 +18,17 @@ export class MailerService {
         'Email Confirmation sent !!!. Please check your inbox to confirm your email address',
     };
   }
+  async emailConfirmedMail({ email, userName }: User) {
+    await this.mailer.sendMail({
+      to: email,
+      subject: 'Congratulations! Your Email Address is Confirmed',
+      template: 'emailConfirmed',
+      context: { userName },
+    });
+    return {
+      message: 'Email Confirmed successfully !!!',
+    };
+  }
 
   async sendPasswordResetEmail({ email, userName }: User, token: string) {
     await this.mailer.sendMail({
