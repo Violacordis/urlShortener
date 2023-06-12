@@ -106,9 +106,9 @@ export class AuthService {
       where: { email },
     });
 
-    if (!user || !user.isVerified) {
+    if (!user) {
       throw new UnauthorizedException(
-        `It's either your email is not yet verified or you don't have an account with us`,
+        `User with email ${email} does not exist`,
       );
     }
 

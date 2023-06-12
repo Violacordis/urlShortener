@@ -1,10 +1,8 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Patch,
   UseGuards,
   UseInterceptors,
