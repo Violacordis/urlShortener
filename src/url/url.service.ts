@@ -147,8 +147,13 @@ export class UrlService {
       if (!url) {
         throw new NotFoundException(`URL not found !`);
       }
+      const qrCode = url.qrcode;
+      const imageBuffer = Buffer.from(qrCode.image);
+      const base64ImageUrl = `data:image/png;base64,${imageBuffer.toString(
+        'base64',
+      )}`;
 
-      return url;
+      return { ...url, qrcode: { ...qrCode, image: base64ImageUrl } };
     } catch (err) {
       throw new Error(err.message);
     }
