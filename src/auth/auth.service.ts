@@ -166,7 +166,6 @@ export class AuthService {
     delete user.password;
 
     await this.mailer.sendPasswordResetEmail(user, token);
-    return user;
   }
 
   async resetPassword(id: string, { token, newPassword }: resetPasswordDto) {
