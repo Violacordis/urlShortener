@@ -110,7 +110,7 @@ export class AuthService {
 
     if (!user || user.isVerified) {
       throw new BadRequestException(
-        `It's either this email is verified or invalid`,
+        `It's either this email is already verified or invalid`,
       );
     }
 

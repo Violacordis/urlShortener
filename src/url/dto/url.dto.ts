@@ -1,4 +1,3 @@
-import { OmitType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
