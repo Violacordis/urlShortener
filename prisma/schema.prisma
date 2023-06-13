@@ -26,15 +26,16 @@ model User {
 }
 
 model Url {
-  id           String   @id @default(uuid())
-  longUrl      String
-  shortUrl     String   @unique
-  title        String?
-  customDomain String?
-  clicks       Int      @default(0)
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id         String   @id @default(uuid())
+  longUrl    String
+  shortUrl   String   @unique
+  title      String?
+  customName String?  @unique
+  clicks     Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  updatedBy  String?  @db.Uuid
 
   userId    String
   user      User                @relation(fields: [userId], references: [id])
@@ -51,6 +52,7 @@ model ShortUrlAnalytics {
   timestamp DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  updatedBy String?  @db.Uuid
 
   urlId String
   url   Url    @relation(fields: [urlId], references: [id])
