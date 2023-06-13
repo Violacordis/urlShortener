@@ -13,47 +13,78 @@ import { Request } from 'express';
 import { appUtils } from '../app.utils';
 import { PrismaService } from '../prisma/prisma.service';
 import { CacheService } from '../utils/cache/cache.service';
+import { QrCodeService } from '../qr-code/qr-code.service';
 
 @Injectable()
 export class UrlService {
-  constructor(private prisma: PrismaService, private cache: CacheService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cache: CacheService,
+    private qrcodeService: QrCodeService,
+  ) {}
 
   async shortenLongUrl(
     user: User,
-    { longUrl, customDomain, ...rest }: shortenLongUrlDto,
+    { longUrl, customName, ...rest }: shortenLongUrlDto,
   ) {
     const shortUrlCode = await appUtils.generateRandomShortCode(7);
     try {
-      // check if longUrl exists in db
       const url = await this.prisma.url.findFirst({
         where: { longUrl },
       });
 
       if (url) {
         return {
-          message: `${longUrl} is already shortened. Here is the shortened url...`,
+          message: `This url already have a short url. Please use the existing short URL below`,
           shortUrl: url.shortUrl,
         };
       }
-      const customDomainUrl = `${customDomain}/${shortUrlCode}`;
 
-      const result = await this.prisma.url.create({
-        data: {
-          ...rest,
-          longUrl,
-          shortUrl: customDomain ? customDomainUrl : shortUrlCode,
-          customDomain,
-          userId: user.id,
-        },
-        include: {
-          user: { select: { id: true } },
-          analytics: true,
-          qrcode: true,
-        },
-      });
+      let result;
+      if (customName) {
+        const domain = await this.prisma.url.findUnique({
+          where: { customName },
+        });
+        if (domain) {
+          throw new BadRequestException(
+            `This domain name is already in use. Please choose another name`,
+          );
+        }
+        result = await this.prisma.url.create({
+          data: {
+            ...rest,
+            longUrl,
+            shortUrl: customName,
+            customName,
+            userId: user.id,
+            updatedBy: user.id,
+          },
+          include: {
+            user: { select: { id: true } },
+            analytics: true,
+            qrcode: true,
+          },
+        });
+      } else {
+        result = await this.prisma.url.create({
+          data: {
+            ...rest,
+            longUrl,
+            shortUrl: shortUrlCode,
+            userId: user.id,
+            updatedBy: user.id,
+          },
+          include: {
+            user: { select: { id: true } },
+            analytics: true,
+            qrcode: true,
+          },
+        });
+      }
+
       return result;
     } catch (err) {
-      throw new NotFoundException('URL not found');
+      throw new NotFoundException(err.message);
     }
   }
 
@@ -80,7 +111,7 @@ export class UrlService {
 
       return url.longUrl;
     } catch (err) {
-      throw new Error(err.message);
+      throw new NotFoundException(err.message);
     }
   }
 
@@ -112,7 +143,7 @@ export class UrlService {
         },
       });
     } catch (err) {
-      throw new Error(err.message);
+      throw new NotFoundException(err.message);
     }
   }
 
@@ -139,7 +170,7 @@ export class UrlService {
 
       return urlsWithModifiedQrCode;
     } catch (err) {
-      return { message: err.message };
+      throw new NotFoundException(err.message);
     }
   }
 
@@ -164,11 +195,11 @@ export class UrlService {
 
       return { ...url, qrcode: { ...qrCode, image: base64ImageUrl } };
     } catch (err) {
-      throw new Error(err.message);
+      throw new NotFoundException(err.message);
     }
   }
 
-  async editUrl(id: string, { longUrl, title }: editUrlDto) {
+  async editUrl(id: string, { longUrl, title, customName }: editUrlDto) {
     try {
       const url = await this.prisma.url.findFirst({
         where: { id, isActive: true },
@@ -180,54 +211,75 @@ export class UrlService {
 
       await this.prisma.url.update({
         where: { id: url.id },
-        data: { longUrl, title },
+        data: {
+          longUrl,
+          title,
+          customName,
+          updatedAt: new Date(),
+          updatedBy: url.userId,
+        },
       });
 
       await this.cache.reset();
     } catch (err) {
-      return { message: err.message };
+      throw new NotFoundException(`customName already exists !`);
     }
   }
 
   async activateUrl(id: string) {
     try {
+      const url = await this.prisma.url.findFirst({
+        where: { id, isActive: false },
+      });
+      if (!url) throw new NotFoundException(`URL is already active !`);
+
       await this.prisma.url.update({
         where: { id },
         data: { isActive: true, updatedAt: new Date() },
       });
     } catch (err) {
-      return { message: err.message };
+      throw new NotFoundException(err.message);
     }
   }
   async deactivateUrl(id: string) {
     try {
+      const url = await this.prisma.url.findFirst({
+        where: { id, isActive: true },
+      });
+      if (!url) throw new NotFoundException(`URL is already deactivated !`);
+
       await this.prisma.url.update({
         where: { id },
         data: { isActive: false, updatedAt: new Date() },
       });
     } catch (err) {
-      return { message: err.message };
+      throw new NotFoundException(err.message);
     }
   }
 
   async deleteUrl(id: string) {
     try {
-      const url = await this.prisma.url.findUnique({ where: { id } });
+      const url = await this.prisma.url.findUnique({
+        where: { id },
+        include: { qrcode: true, analytics: true },
+      });
 
       if (!url) {
         throw new NotFoundException('URL Not Found');
       }
 
-      await this.prisma.shortUrlAnalytics.deleteMany({
-        where: { urlId: id },
-      });
+      if (url.qrcode || url.analytics.length) {
+        await this.prisma.shortUrlAnalytics.deleteMany({
+          where: { urlId: id },
+        });
+        await this.qrcodeService.deleteQrCode(id);
+      }
 
-      await this.prisma.qrCode.delete({ where: { urlId: id } });
       await this.prisma.url.delete({ where: { id } });
 
       await this.cache.reset();
     } catch (err) {
-      return { message: err.message };
+      throw new NotFoundException(err.message);
     }
   }
 }

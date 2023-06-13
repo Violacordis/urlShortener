@@ -14,7 +14,7 @@ export class shortenLongUrlDto {
 
   @IsString()
   @IsOptional()
-  customDomain?: string;
+  customName?: string;
 
   @IsString()
   @IsOptional()
@@ -32,4 +32,16 @@ export class updateShortUrlAnalyticsDto {
   ipAddress: string;
 }
 
-export class editUrlDto extends OmitType(shortenLongUrlDto, ['customDomain']) {}
+export class editUrlDto {
+  @IsUrl({}, { message: 'Invalid URL' })
+  @IsOptional()
+  longUrl: string;
+
+  @IsString()
+  @IsOptional()
+  customName?: string;
+
+  @IsString()
+  @IsOptional()
+  title?: string;
+}

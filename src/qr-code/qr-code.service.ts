@@ -67,15 +67,15 @@ export class QrCodeService {
 
   async deleteQrCode(id: string) {
     try {
-      const qrcode = await this.prisma.qrCode.findFirst({
+      const qrcode = await this.prisma.qrCode.findUnique({
         where: { urlId: id },
       });
 
-      if (!qrcode) throw new NotFoundException(`QR Code not found`);
+      if (!qrcode) throw new NotFoundException(`URL not found`);
 
       await this.prisma.qrCode.delete({ where: { urlId: id } });
     } catch (err) {
-      throw new Error(err.message);
+      throw new NotFoundException(err.message);
     }
   }
 }

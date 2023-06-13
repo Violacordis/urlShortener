@@ -21,34 +21,12 @@ export class AppController {
     @Req() request: Request,
     @Res() response: Response,
   ) {
-    const url = await this.prisma.url.findFirst({
-      where: { shortUrl, isActive: true },
-    });
+    const longUrl = await this.url.redirectToLongUrl(shortUrl, request);
 
-    if (url.customDomain) {
-      const domain = url.customDomain;
-      const originalUrl = decodeURIComponent(request.originalUrl);
-      const path = originalUrl.replace(`/${domain}/`, '');
-      const customDomainUrl = `${domain}/${path}`;
-
-      const longUrl = await this.url.redirectToLongUrl(
-        customDomainUrl,
-        request,
-      );
-
-      if (longUrl) {
-        response.redirect(301, longUrl);
-      } else {
-        response.status(404).send('URL not found');
-      }
+    if (longUrl) {
+      response.redirect(301, longUrl);
     } else {
-      const longUrl = await this.url.redirectToLongUrl(shortUrl, request);
-
-      if (longUrl) {
-        response.redirect(301, longUrl);
-      } else {
-        response.status(404).send('URL not found');
-      }
+      response.status(404).send('URL not found');
     }
   }
 }
