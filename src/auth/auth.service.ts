@@ -56,7 +56,6 @@ export class AuthService {
 
       return user;
     } catch (err) {
-      console.log(err.message);
       if (err.code === 'P2002') {
         throw new ForbiddenException('Email address already exists');
       }
@@ -69,103 +68,125 @@ export class AuthService {
     @Param('id', ParseUUIDPipe) id: string,
     { token }: verifyEmailDto,
   ) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
 
-    if (!user) {
-      throw new BadRequestException(
-        `Invalid credentials !!. We are unable to verify your email address`,
+      if (!user) {
+        throw new BadRequestException(
+          `Invalid credentials !!. We are unable to verify your email address`,
+        );
+      }
+
+      if (user.isVerified) {
+        return { message: 'This Email is already verified' };
+      }
+
+      const verifyToken = await this.tokenService.validateToken(
+        TokenEnumType.EMAIL_VERIFICATION,
+        user.email,
+        token,
       );
+
+      if (!verifyToken) {
+        throw new BadRequestException(
+          `Invalid credentials !!. We are unable to verify your email address yet`,
+        );
+      }
+
+      await this.prisma.user.update({
+        where: { id },
+        data: { isVerified: true },
+      });
+
+      await this.mailer.emailConfirmedMail(user);
+    } catch (err) {
+      throw new UnauthorizedException(err.message);
     }
-
-    if (user.isVerified) {
-      return { message: 'This Email is already verified' };
-    }
-
-    const verifyToken = await this.tokenService.validateToken(
-      TokenEnumType.EMAIL_VERIFICATION,
-      user.email,
-      token,
-    );
-
-    if (!verifyToken) {
-      throw new BadRequestException(
-        `Invalid credentials !!. We are unable to verify your email address yet`,
-      );
-    }
-
-    await this.prisma.user.update({
-      where: { id },
-      data: { isVerified: true },
-    });
-
-    await this.mailer.emailConfirmedMail(user);
   }
 
   async resendToken(id: string, TokenEnumType) {
-    const user = await this.prisma.user.findFirst({
-      where: { id, isVerified: false },
-    });
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: { id, isVerified: false },
+      });
 
-    if (!user || user.isVerified) {
-      throw new BadRequestException(
-        `It's either this email is already verified or invalid`,
+      if (!user || user.isVerified) {
+        throw new BadRequestException(
+          `It's either this email is already verified or invalid`,
+        );
+      }
+
+      const token = await this.tokenService.generateToken(
+        TokenEnumType,
+        user.email,
+        5 * 60 * 1000,
       );
+
+      await this.mailer.sendEmailConfirmationMail(user, token);
+    } catch (err) {
+      throw new UnauthorizedException(err.message);
     }
-
-    const token = await this.tokenService.generateToken(
-      TokenEnumType,
-      user.email,
-      5 * 60 * 1000,
-    );
-
-    await this.mailer.sendEmailConfirmationMail(user, token);
   }
 
   async login({ email, password }: loginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email },
+      });
 
-    if (!user) {
-      throw new UnauthorizedException(
-        `User with email ${email} does not exist`,
-      );
+      if (!user) {
+        throw new UnauthorizedException(
+          `User with email ${email} does not exist`,
+        );
+      }
+
+      if (!user.isVerified) {
+        throw new UnauthorizedException(
+          `Email is not verified. Please verify your email`,
+        );
+      }
+
+      const verifyPassword = await argon.verify(user.password, password);
+      if (!verifyPassword) {
+        throw new UnauthorizedException(`Invalid credentials`);
+      }
+
+      const access_token = await this.signToken(user.id, user.email);
+
+      delete user.password;
+      return {
+        access_token,
+        data: {
+          user,
+        },
+      };
+    } catch (err) {
+      throw new UnauthorizedException(err.message);
     }
-
-    const verifyPassword = await argon.verify(user.password, password);
-    if (!verifyPassword) {
-      throw new UnauthorizedException(`Invalid credentials`);
-    }
-
-    const access_token = await this.signToken(user.id, user.email);
-
-    delete user.password;
-    return {
-      access_token,
-      data: {
-        user,
-      },
-    };
   }
 
   async forgotPassword({ email }: forgotPasswordDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
-    if (!user) {
-      throw new UnauthorizedException(`Invalid credentials`);
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email },
+      });
+      if (!user) {
+        throw new UnauthorizedException(`Invalid credentials`);
+      }
+
+      const token = await this.tokenService.generateToken(
+        TokenEnumType.PASSWORD_RESET,
+        user.email,
+        5 * 60 * 1000,
+      );
+      delete user.password;
+
+      await this.mailer.sendPasswordResetEmail(user, token);
+    } catch (err) {
+      throw new UnauthorizedException(err.message);
     }
-
-    const token = await this.tokenService.generateToken(
-      TokenEnumType.PASSWORD_RESET,
-      user.email,
-      5 * 60 * 1000,
-    );
-    delete user.password;
-
-    await this.mailer.sendPasswordResetEmail(user, token);
   }
 
   async resetPassword(id: string, { token, newPassword }: resetPasswordDto) {
@@ -197,25 +218,32 @@ export class AuthService {
     { email }: User,
     { currentPassword, newPassword }: changePasswordDto,
   ) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    try {
+      const user = await this.prisma.user.findUnique({ where: { email } });
 
-    if (!user) {
-      throw new UnauthorizedException(`Invalid credentials`);
+      if (!user) {
+        throw new UnauthorizedException(`Invalid credentials`);
+      }
+
+      const isPasswordAMatch = await argon.verify(
+        user.password,
+        currentPassword,
+      );
+
+      if (!isPasswordAMatch) {
+        throw new ForbiddenException(`Incorrect Password`);
+      }
+      const hashPassword = await argon.hash(newPassword);
+
+      await this.prisma.user.update({
+        where: { email: user.email },
+        data: { password: hashPassword },
+      });
+
+      delete user.password;
+    } catch (err) {
+      throw new UnauthorizedException(err.message);
     }
-
-    const isPasswordAMatch = await argon.verify(user.password, currentPassword);
-
-    if (!isPasswordAMatch) {
-      throw new ForbiddenException(`Incorrect Password`);
-    }
-    const hashPassword = await argon.hash(newPassword);
-
-    await this.prisma.user.update({
-      where: { email: user.email },
-      data: { password: hashPassword },
-    });
-
-    delete user.password;
   }
 
   private async signToken(userId: string, email: string): Promise<string> {
