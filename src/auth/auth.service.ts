@@ -49,7 +49,7 @@ export class AuthService {
       const token = await this.tokenService.generateToken(
         TokenEnumType.EMAIL_VERIFICATION,
         user.email,
-        5 * 60 * 1000,
+        10 * 60 * 1000,
       );
 
       await this.mailer.sendEmailConfirmationMail(user, token);
@@ -121,7 +121,7 @@ export class AuthService {
       const token = await this.tokenService.generateToken(
         TokenEnumType,
         user.email,
-        5 * 60 * 1000,
+        10 * 60 * 1000,
       );
 
       await this.mailer.sendEmailConfirmationMail(user, token);
@@ -179,7 +179,7 @@ export class AuthService {
       const token = await this.tokenService.generateToken(
         TokenEnumType.PASSWORD_RESET,
         user.email,
-        5 * 60 * 1000,
+        10 * 60 * 1000,
       );
       delete user.password;
 
