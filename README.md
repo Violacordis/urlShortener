@@ -22,17 +22,80 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+# Shortify
+
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Shortify is a URL shortener app that allow users to create shortened URLs for easier sharing and tracking of links. It provides a simple and convenient way to transform long and complex URLs into short and manageable ones.
 
-## Installation
+---
+
+## Requirements
+
+- Authentication and Authorization
+
+  - User Signup: Allows users to create an account.
+  - Email Verification: Sends a token via email for email verification. User email must be verified before logging in.
+  - User Login: Enables users to log into their accounts.
+  - Forgot Password: Provides a mechanism to reset a forgotten password.
+  - Reset Password: Allows users to reset their passwords.
+  - Change Password: Enables users to change their current passwords.
+
+- Profile
+
+  - View Profile Details: Displays user profile information, including email and username.
+  - Edit Username: Allows users to update their usernames.
+
+- URL Management
+  - Create Short URL: Generates shortened links for long URLs.
+  - Edit URLs and Details: Provides the ability to modify long URLs, custom names, and titles.
+  - View All URLs: Lists all URLs created by the user.
+  - View a Particular URL: Displays details of a specific URL.
+  - Activate and Deactivate URLs: Allows users to enable or disable URLs.
+  - URL Redirection: Automatically redirects shortened URLs to the original long URLs, incrementing the click count.
+  - View URL Analytics: Presents analytics for each URL, including the number of clicks, the device used, and the IP address.
+  - Generate QR Code: Generates a QR code for the shortened URLs.
+  - Delete QR Code: Removes the QR code associated with a URL.
+  - Delete URL: Permanently deletes a URL from the user's account.
+  <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+## Built with:
+
+- Nestjs
+- Prisma ORM
+- Postgres Database
+
+---
+
+## Installation and Setup
+
+To set up the Shortify API, follow these steps:
+
+1. Clone the repository :
+
+```bash
+$ git clone https://github.com/Violacordis/urlShortener.git
+```
+
+2. Navigate to the project directory :
+
+```bash
+$ cd urlShortener
+```
+
+3. Install the dependencies :
 
 ```bash
 $ yarn install
 ```
 
-## Running the app
+4. Configure the environment variables :
+
+- create your .env file at the root of your project and define your variables using my example.env file.
+
+5. Start the application
 
 ```bash
 # development
@@ -45,29 +108,44 @@ $ yarn run start:dev
 $ yarn run start:prod
 ```
 
-## Test
+6. Access the API endpoints using a suitable API testing tool such as Postman or swagger.
 
-```bash
-# unit tests
-$ yarn run test
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# e2e tests
-$ yarn run test:e2e
+---
 
-# test coverage
-$ yarn run test:cov
-```
+## Base URL
 
-## Support
+- [My shortify API base URL](https://shortify-rg0z.onrender.com)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## Acknowledgement
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- [AltschoolAfrica](https://www.altschoolafrica.com/)
 
-## License
+---
 
-Nest is [MIT licensed](LICENSE).
+## Contact
+
+- Twitter: [@ikemviola](https://twitter.com/Ikemviola)
+
+- Email: [email](ikemviolacordis@gmail.com)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+### API Documentation
+
+- [Postman documentation](https://documenter.getpostman.com/view/22967625/2s93shz9ks)
+
+- [Swagger documentation](https://shortify-rg0z.onrender.com/swagger)
+
+---
+
+## Contributor
+
+- Ikem Violacordis Ada
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
