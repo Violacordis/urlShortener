@@ -34,7 +34,7 @@ export class updateShortUrlAnalyticsDto {
 export class editUrlDto {
   @IsUrl({}, { message: 'Invalid URL' })
   @IsOptional()
-  longUrl: string;
+  longUrl?: string;
 
   @IsString()
   @IsOptional()
