@@ -36,6 +36,7 @@ Shortify is a URL shortener app that allow users to create shortened URLs for ea
 
   - User Signup: Allows users to create an account.
   - Email Verification: Sends a token via email for email verification. User email must be verified before logging in.
+  - Resend token: Resends token via email for email verification on user's request if the previous token sent is already invalid.
   - User Login: Enables users to log into their accounts.
   - Forgot Password: Provides a mechanism to reset a forgotten password.
   - Reset Password: Allows users to reset their passwords.
@@ -120,9 +121,13 @@ $ yarn run start:prod
 
 ---
 
-## Acknowledgement
+### API Documentation
 
-- [AltschoolAfrica](https://www.altschoolafrica.com/)
+- [Postman documentation](https://documenter.getpostman.com/view/22967625/2s93shz9ks)
+
+- [Swagger documentation](https://shortify-rg0z.onrender.com/swagger)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ---
 
@@ -136,11 +141,9 @@ $ yarn run start:prod
 
 ---
 
-### API Documentation
+## Acknowledgement
 
-- [Postman documentation](https://documenter.getpostman.com/view/22967625/2s93shz9ks)
-
-- [Swagger documentation](https://shortify-rg0z.onrender.com/swagger)
+- [AltschoolAfrica](https://www.altschoolafrica.com/)
 
 ---
 
