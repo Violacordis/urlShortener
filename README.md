@@ -96,7 +96,21 @@ $ yarn install
 
 - create your .env file at the root of your project and define your variables using my example.env file.
 
-5. Start the application
+5. Run prisma generate and migration. This ensures that your database schema is up to date with the latest changes defined in your Prisma schema file (schema.prisma).
+
+```bash
+$ npx prisma generate
+$ npx prisma migrate dev
+```
+
+6. Start your redis server
+
+```bash
+# On Ubuntu
+$ sudo service redis-server start
+```
+
+7. Start the application
 
 ```bash
 # development
