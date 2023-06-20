@@ -4,6 +4,8 @@ import {
   IsString,
   IsUrl,
   IsDate,
+  Max,
+  MaxLength,
 } from 'class-validator';
 
 export class shortenLongUrlDto {
@@ -13,6 +15,9 @@ export class shortenLongUrlDto {
 
   @IsString()
   @IsOptional()
+  @MaxLength(10, {
+    message: 'Custom name must not be longer than 10 characters',
+  })
   customName?: string;
 
   @IsString()
