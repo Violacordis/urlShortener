@@ -139,7 +139,7 @@ $ yarn run start:prod
 
 ## Shortify app end to end Testing
 
-- ![Shortify app end-to-end testing](test\shortifyTest.png)
+- ![Shortify app end-to-end testing](shortifyTest.png)
 
 ### API Documentation
 
