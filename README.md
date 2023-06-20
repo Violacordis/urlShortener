@@ -62,11 +62,13 @@ Shortify is a URL shortener app that allow users to create shortened URLs for ea
 
 ---
 
-## Built with:
+## Technologies/Tools used:
 
 - Nestjs
 - Prisma ORM
 - Postgres Database
+- Pactum : Test runner
+- Supertest / Jest : For Testing
 
 ---
 
@@ -134,6 +136,10 @@ $ yarn run start:prod
 - [My shortify API base URL](https://shortify-rg0z.onrender.com)
 
 ---
+
+## Shortify app end to end Testing
+
+- ![Shortify app end-to-end testing](test\shortifyTest.png)
 
 ### API Documentation
 
