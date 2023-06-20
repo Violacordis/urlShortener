@@ -38,9 +38,5 @@ export class editUrlDto {
 
   @IsString()
   @IsOptional()
-  customName?: string;
-
-  @IsString()
-  @IsOptional()
   title?: string;
 }

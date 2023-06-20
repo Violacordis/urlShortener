@@ -199,7 +199,7 @@ export class UrlService {
     }
   }
 
-  async editUrl(id: string, { longUrl, title, customName }: editUrlDto) {
+  async editUrl(id: string, { longUrl, title }: editUrlDto) {
     try {
       const url = await this.prisma.url.findFirst({
         where: { id, isActive: true },
@@ -214,7 +214,6 @@ export class UrlService {
         data: {
           longUrl,
           title,
-          customName,
           updatedAt: new Date(),
           updatedBy: url.userId,
         },
