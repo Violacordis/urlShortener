@@ -22,7 +22,7 @@ export class shortenLongUrlDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(30, {
-    message: 'Custom name must not be longer than 30 characters',
+    message: 'Title must not be longer than 30 characters',
   })
   title: string;
 }
