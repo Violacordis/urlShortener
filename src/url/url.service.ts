@@ -30,7 +30,7 @@ export class UrlService {
     const shortUrlCode = await appUtils.generateRandomShortCode(7);
     try {
       const url = await this.prisma.url.findFirst({
-        where: { longUrl },
+        where: { longUrl, userId: user.id },
       });
 
       if (url) {
