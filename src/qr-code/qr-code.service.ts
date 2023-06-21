@@ -12,7 +12,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class QrCodeService {
   constructor(private prisma: PrismaService, private config: ConfigService) {}
 
-  async generateQrCode(urlId: string): Promise<Buffer> {
+  async generateQrCode(urlId: string): Promise<string> {
     try {
       const url = await this.prisma.url.findFirst({
         where: { id: urlId, isActive: true },
@@ -40,6 +40,10 @@ export class QrCodeService {
         .png()
         .toBuffer();
 
+      const base64ImageUrl = `data:image/png;base64,${qrCodeBuffer.toString(
+        'base64',
+      )}`;
+
       await this.prisma.qrCode.create({
         data: {
           url: { connect: { id: urlId } },
@@ -47,7 +51,7 @@ export class QrCodeService {
         },
       });
 
-      return qrCodeImage;
+      return base64ImageUrl;
     } catch (err) {
       throw new Error(err.message);
     }
