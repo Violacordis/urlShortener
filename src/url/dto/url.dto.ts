@@ -20,11 +20,11 @@ export class shortenLongUrlDto {
   customName?: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   @MaxLength(30, {
     message: 'Custom name must not be longer than 30 characters',
   })
-  title?: string;
+  title: string;
 }
 
 export class updateShortUrlAnalyticsDto {
