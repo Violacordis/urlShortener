@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,7 +13,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class QrCodeService {
   constructor(private prisma: PrismaService, private config: ConfigService) {}
 
-  async generateQrCode(urlId: string): Promise<string> {
+  async generateQrCode(urlId: string) {
     try {
       const url = await this.prisma.url.findFirst({
         where: { id: urlId, isActive: true },
@@ -22,6 +23,12 @@ export class QrCodeService {
         throw new NotFoundException(
           `URL not found. This URL may have been deactivated`,
         );
+
+      const qrcode = await this.prisma.qrCode.findUnique({
+        where: { urlId: url.id },
+      });
+
+      if (!qrcode) throw new ConflictException(`QR Code already exists`);
 
       const baseUrl = this.config.get('BASE_URL');
       const qrCodeUrl = `${baseUrl}/${url.shortUrl}`;
@@ -40,10 +47,6 @@ export class QrCodeService {
         .png()
         .toBuffer();
 
-      const base64ImageUrl = `data:image/png;base64,${qrCodeBuffer.toString(
-        'base64',
-      )}`;
-
       await this.prisma.qrCode.create({
         data: {
           url: { connect: { id: urlId } },
@@ -51,21 +54,32 @@ export class QrCodeService {
         },
       });
 
-      return base64ImageUrl;
+      const base64ImageUrl = `data:image/png;base64,${qrCodeBuffer.toString(
+        'base64',
+      )}`;
+
+      return { message: 'QrCode generated successfully!', base64ImageUrl };
     } catch (err) {
-      throw new Error(err.message);
+      throw new BadRequestException(err.message);
     }
   }
 
   async fetchQrCode(id: string) {
     try {
-      const qrcode = await this.prisma.qrCode.findFirst({ where: { id } });
+      const qrcode = await this.prisma.qrCode.findFirst({
+        where: { urlId: id },
+      });
 
       if (!qrcode) throw new BadRequestException(`QR Code not found`);
 
-      return qrcode.image;
+      const qrCodeBuffer = Buffer.from(qrcode.image);
+      const base64ImageUrl = `data:image/png;base64,${qrCodeBuffer.toString(
+        'base64',
+      )}`;
+
+      return base64ImageUrl;
     } catch (err) {
-      throw new Error(err.message);
+      throw new BadRequestException(err.message);
     }
   }
 
