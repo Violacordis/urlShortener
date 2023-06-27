@@ -28,7 +28,7 @@ export class QrCodeService {
         where: { urlId: url.id },
       });
 
-      if (!qrcode) throw new ConflictException(`QR Code already exists`);
+      if (qrcode) throw new ConflictException(`QR Code already exists`);
 
       const baseUrl = this.config.get('BASE_URL');
       const qrCodeUrl = `${baseUrl}/${url.shortUrl}`;
