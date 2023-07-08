@@ -35,7 +35,7 @@ Shortify is a URL shortener app that allow users to create shortened URLs for ea
 - Authentication and Authorization
 
   - User Signup: Allows users to create an account.
-  - Email Verification: Sends a token via email for email verification. User email must be verified before logging in.
+  - Email Verification: Sends a token via email for email verification. User email must be verified before logging in. The token expires in 10mins.
   - Resend token: Resends token via email for email verification on user's request if the previous token sent is already invalid.
   - User Login: Enables users to log into their accounts.
   - Forgot Password: Provides a mechanism to reset a forgotten password.
