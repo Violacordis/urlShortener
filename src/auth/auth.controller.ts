@@ -74,9 +74,12 @@ export class AuthController {
   @ApiResponseMetadata({
     message: 'You have successfully reset your Password !!',
   })
-  @Patch('reset-password/:id')
-  async resetPassword(@Param('id') id: string, @Body() dto: resetPasswordDto) {
-    return this.authService.resetPassword(id, dto);
+  @Patch('reset-password/:email')
+  async resetPassword(
+    @Param('email') email: string,
+    @Body() dto: resetPasswordDto,
+  ) {
+    return this.authService.resetPassword(email, dto);
   }
 
   @ApiResponseMetadata({

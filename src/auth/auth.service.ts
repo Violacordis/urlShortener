@@ -189,9 +189,9 @@ export class AuthService {
     }
   }
 
-  async resetPassword(id: string, { token, newPassword }: resetPasswordDto) {
+  async resetPassword(email: string, { token, newPassword }: resetPasswordDto) {
     const user = await this.prisma.user.findFirst({
-      where: { id },
+      where: { email },
     });
 
     if (!user) {
