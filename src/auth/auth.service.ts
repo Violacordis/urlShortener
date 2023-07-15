@@ -65,12 +65,12 @@ export class AuthService {
   }
 
   async verifyEmail(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('email', ParseUUIDPipe) email: string,
     { token }: verifyEmailDto,
   ) {
     try {
       const user = await this.prisma.user.findUnique({
-        where: { id },
+        where: { email },
       });
 
       if (!user) {
@@ -96,7 +96,7 @@ export class AuthService {
       }
 
       await this.prisma.user.update({
-        where: { id },
+        where: { email },
         data: { isVerified: true },
       });
 

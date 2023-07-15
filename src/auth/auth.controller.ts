@@ -41,9 +41,12 @@ export class AuthController {
   }
 
   @ApiResponseMetadata({ message: 'Email address verified successfully' })
-  @Post('verify-email/:id')
-  async verifyEmail(@Param('id') id: string, @Body() dto: verifyEmailDto) {
-    return this.authService.verifyEmail(id, dto);
+  @Post('verify-email/:email')
+  async verifyEmail(
+    @Param('email') email: string,
+    @Body() dto: verifyEmailDto,
+  ) {
+    return this.authService.verifyEmail(email, dto);
   }
 
   @ApiResponseMetadata({ message: 'New Token sent successfully!!!' })
