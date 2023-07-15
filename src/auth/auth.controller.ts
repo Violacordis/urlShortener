@@ -51,9 +51,12 @@ export class AuthController {
 
   @ApiResponseMetadata({ message: 'New Token sent successfully!!!' })
   @HttpCode(HttpStatus.OK)
-  @Post('new-token/:id')
-  resendToken(@Param('id') id: string) {
-    return this.authService.resendToken(id, TokenEnumType.EMAIL_VERIFICATION);
+  @Post('new-token/:email')
+  resendToken(@Param('email') email: string) {
+    return this.authService.resendToken(
+      email,
+      TokenEnumType.EMAIL_VERIFICATION,
+    );
   }
 
   @ApiResponseMetadata({ message: 'You have logged in!' })

@@ -106,10 +106,10 @@ export class AuthService {
     }
   }
 
-  async resendToken(id: string, TokenEnumType) {
+  async resendToken(email: string, TokenEnumType) {
     try {
       const user = await this.prisma.user.findFirst({
-        where: { id, isVerified: false },
+        where: { email, isVerified: false },
       });
 
       if (!user || user.isVerified) {
